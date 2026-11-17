@@ -16,6 +16,13 @@ public class StudentService
             throw new InvalidOperationException("Student not found");
         return student.IsAdult();
     }
+    public string GetStudentName(int id)
+    {
+        var student = _repository.GetById(id);
+        if (student == null)
+            throw new InvalidOperationException("Student not found");
+        return student.Name;
+    }
 
     public void RegisterStudent(Student student)
     {

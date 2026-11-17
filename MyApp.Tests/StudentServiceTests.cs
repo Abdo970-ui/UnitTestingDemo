@@ -47,4 +47,41 @@ public class StudentServiceTests
         // Assert
         mockRepo.Verify(r => r.Save(student), Times.Once);
     }
+    [Fact]
+    public void IsStudentAdult_MinorStudent_ReturnsFalse()
+    {
+        // Arrange
+        var mockRepo = new Mock<IStudentRepository>();
+        mockRepo.Setup(r => r.GetById(2))
+                .Returns(new Student { Age = 17 });
+        var service = new StudentService(mockRepo.Object);
+        // Act
+        var result = service.IsStudentAdult(2);
+        // Assert
+        Assert.False(result);
+    }
+    [Fact]
+    public void GetStudentName_StudentExists_ReturnsName()
+    {
+        // Arrange
+        var mockRepo = new Mock<IStudentRepository>();
+        mockRepo.Setup(r => r.GetById(1))
+                .Returns(new Student { Name = "Ahmed" });
+        var service = new StudentService(mockRepo.Object);
+        // Act
+        var result = service.GetStudentName(1);
+        // Assert
+        Assert.Equal("Ahmed", result);
+    }
+    [Fact]
+    public void GetStudentName_StudentNotFound_ThrowsException()
+    {
+        // Arrange
+        var mockRepo = new Mock<IStudentRepository>();
+        mockRepo.Setup(r => r.GetById(99))
+                .Returns((Student?)null);
+        var service = new StudentService(mockRepo.Object);
+        // Act + Assert
+        Assert.Throws<InvalidOperationException>(() => service.GetStudentName(99));
+    }
 }
