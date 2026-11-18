@@ -1,4 +1,5 @@
-﻿namespace MyApp.Tests;
+﻿using AwesomeAssertions;
+namespace MyApp.Tests;
 
 public class BankAccountTests
 {
@@ -12,7 +13,10 @@ public class BankAccountTests
         account.Deposit(100);
 
         // Assert
-        Assert.Equal(100, account.Balance);
+        //Assert.Equal(100, account.Balance);
+
+        // Fluent Assertions
+        account.Balance.Should().Be(100);
     }
     [Theory]
     [InlineData(-50)]
@@ -24,6 +28,7 @@ public class BankAccountTests
 
         // Act + Assert
         Assert.Throws<ArgumentException>(() => account.Deposit(amount));
+
     }
     [Fact]
     public void Withdraw_ValidAmount_DecreasesBalance()
@@ -36,6 +41,20 @@ public class BankAccountTests
         account.Withdraw(30);
 
         // Assert
-        Assert.Equal(70, account.Balance);
+        //Assert.Equal(70, account.Balance);
+        
+        // OR
+
+        // Fluent Assertions
+        account.Balance.Should().Be(70);
+    }
+    [Fact]
+    public void Deposit_PositiveAmount_IncreasesBalance_Fluent()
+    {
+        var account = new BankAccount();
+
+        account.Deposit(100);
+
+        account.Balance.Should().Be(100);
     }
 }
