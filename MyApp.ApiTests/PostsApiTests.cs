@@ -67,5 +67,57 @@ public class PostsApiTests : IDisposable
         Assert.Equal("My new post", created.Title);
         Assert.Equal(99, created.UserId);
     }
+    [Fact]
+    public async Task UpdatePost_ExistingId_ReturnsUpdatedPost()
+    {
+        // Arrange
+        var update = new { UserId = 1, Title = "Updated title", Body = "Updated body" };
+
+        // Act
+        var response = await _client.PutAsJsonAsync("/posts/1", update);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var updated = await response.Content.ReadFromJsonAsync<Post>();
+        Assert.NotNull(updated);
+        Assert.Equal(1, updated.Id);
+        Assert.Equal("Updated title", updated.Title);
+
+        // نتأكد إن التعديل اتحفظ فعلاً
+        var fetched = await _client.GetFromJsonAsync<Post>("/posts/1");
+        Assert.Equal("Updated title", fetched!.Title);
+    }
+
+    [Fact]
+    public async Task DeletePost_ExistingId_ReturnsNoContentAndPostIsGone()
+    {
+        // Act
+        var deleteResponse = await _client.DeleteAsync("/posts/1");
+
+        // Assert
+        Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
+
+        var getResponse = await _client.GetAsync("/posts/1");
+        Assert.Equal(HttpStatusCode.NotFound, getResponse.StatusCode);
+    }
+    [Fact]
+    public async Task UpdatePost_NonExistingId_ReturnsNotFound()
+    {
+        // Arrange
+        var update = new { UserId = 1, Title = "Updated title", Body = "Updated body" };
+        // Act
+        var response = await _client.PutAsJsonAsync("/posts/999", update);
+        // Assert
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+    [Fact]
+    public async Task DeletePost_NonExistingId_ReturnsNotFound()
+    {
+        // Act
+        var response = await _client.DeleteAsync("/posts/999");
+        // Assert
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
 }
 public record Post(int Id, int UserId, string Title, string Body);

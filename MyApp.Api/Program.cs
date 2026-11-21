@@ -24,6 +24,26 @@ app.MapPost("/posts", (NewPost input) =>
     return Results.Created($"/posts/{post.Id}", post);
 });
 
+
+app.MapPut("/posts/{id:int}", (int id, NewPost input) =>
+{
+    var index = posts.FindIndex(p => p.Id == id);
+    if (index == -1) return Results.NotFound();
+
+    var updated = new Post(id, input.UserId, input.Title, input.Body);
+    posts[index] = updated;
+    return Results.Ok(updated);
+});
+
+app.MapDelete("/posts/{id:int}", (int id) =>
+{
+    var post = posts.FirstOrDefault(p => p.Id == id);
+    if (post is null) return Results.NotFound();
+
+    posts.Remove(post);
+    return Results.NoContent();
+});
+
 app.Run();
 
 record Post(int Id, int UserId, string Title, string Body);
