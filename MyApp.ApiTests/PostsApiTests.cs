@@ -119,5 +119,31 @@ public class PostsApiTests : IDisposable
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    public async Task CreatePost_EmptyTitle_ReturnsBadRequest(string title)
+    {
+        // Arrange
+        var invalidPost = new { UserId = 1, Title = title, Body = "Some body" };
+
+        // Act
+        var response = await _client.PostAsJsonAsync("/posts", invalidPost);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    public async Task UpdatePost_EmptyTitle_ReturnsBadRequest(string title)
+    {
+        // Arrange
+        var invalidUpdate = new { UserId = 1, Title = title, Body = "Some body" };
+        // Act
+        var response = await _client.PutAsJsonAsync("/posts/1", invalidUpdate);
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
 }
 public record Post(int Id, int UserId, string Title, string Body);

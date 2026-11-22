@@ -19,6 +19,9 @@ app.MapGet("/posts/{id:int}", (int id) =>
 
 app.MapPost("/posts", (NewPost input) =>
 {
+    if (!HasValidTitle(input))
+        return Results.BadRequest("Title is required");
+
     var post = new Post(posts.Max(p => p.Id) + 1, input.UserId, input.Title, input.Body);
     posts.Add(post);
     return Results.Created($"/posts/{post.Id}", post);
@@ -27,12 +30,13 @@ app.MapPost("/posts", (NewPost input) =>
 
 app.MapPut("/posts/{id:int}", (int id, NewPost input) =>
 {
-    var index = posts.FindIndex(p => p.Id == id);
-    if (index == -1) return Results.NotFound();
-
-    var updated = new Post(id, input.UserId, input.Title, input.Body);
-    posts[index] = updated;
-    return Results.Ok(updated);
+    var post = posts.FirstOrDefault(p => p.Id == id);
+    if (post is null) return Results.NotFound();
+    if (!HasValidTitle(input))
+        return Results.BadRequest("Title is required");
+    var updatedPost = new Post(post.Id, input.UserId, input.Title, input.Body);
+    posts[posts.IndexOf(post)] = updatedPost;
+    return Results.Ok(updatedPost);
 });
 
 app.MapDelete("/posts/{id:int}", (int id) =>
@@ -43,7 +47,7 @@ app.MapDelete("/posts/{id:int}", (int id) =>
     posts.Remove(post);
     return Results.NoContent();
 });
-
+static bool HasValidTitle(NewPost input) => !string.IsNullOrWhiteSpace(input.Title);
 app.Run();
 
 record Post(int Id, int UserId, string Title, string Body);
