@@ -1,0 +1,73 @@
+{
+  "info": {
+    "_postman_id": "9ab9b6ca-d14e-4f76-85cf-921027656e45",
+    "name": "Posts API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "55213726",
+    "_collection_link": "https://go.postman.co/collection/55213726-9ab9b6ca-d14e-4f76-85cf-921027656e45?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Get post by id",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Post has the correct id\", function () {\r\n    const post = pm.response.json();\r\n    pm.expect(post.id).to.eql(1);\r\n    pm.expect(post.userId).to.eql(1);\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5100/posts/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "5100",
+          "path": [
+            "posts",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get non-existing post",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 404\", function () {\r\n    pm.response.to.have.status(404);\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5100/posts/999",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "5100",
+          "path": [
+            "posts",
+            "999"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
